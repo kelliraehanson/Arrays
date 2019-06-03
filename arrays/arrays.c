@@ -73,6 +73,13 @@ typedef struct Array {
   char **elements;  // The string elements contained in the array
 } Array;
 
+// Remember!
+// gcc -o arrays arrays.c
+// ./arrays
+// You can add -g -Wall for debugging purposes 
+// gcc -Wall -Wextra -o arrays arrays.c
+// open another terminal window and ps al for a process list command
+// S+ ./arrays means is in some form of sleep because it is wainting for keyboard input.
 
 /************************************
  *
@@ -85,10 +92,14 @@ typedef struct Array {
  *****/
 Array *create_array (int capacity) {
   // Allocate memory for the Array struct
-
+  Array *arr = malloc(sizeof(Array)); // sizeof(Array) returns 16
   // Set initial values for capacity and count
-
+  arr->capacity = capacity; // You don't have to call a malloc here because it is bulit into the size of int capacity; int count; and char **elements; in the Array struct
+  arr->count = 0; // You don't have to call a malloc here because it is bulit into the size of int capacity; int count; and char **elements; in the Array struct
   // Allocate memory for elements
+  arr->elements = malloc(capacity * sizeof(char *)); // This is (char *) and not (char) because you 
+  // have a pointer to an array of pointers in the Array struct: char **elements;
+  return arr;
 
 }
 
@@ -99,8 +110,10 @@ Array *create_array (int capacity) {
 void destroy_array(Array *arr) {
 
   // Free all elements
+  free(arr->elements);
 
   // Free array
+  free(arr);
 
 }
 
@@ -111,12 +124,20 @@ void destroy_array(Array *arr) {
 void resize_array(Array *arr) {
 
   // Create a new element storage with double capacity
+  char **double_storage = malloc(2 * sizeof(arr));
 
   // Copy elements into the new storage
+  for (int i = 0; i < arr->capacity; i++)
+  {
+    double_storage[i] = arr->elements[i];
+  }
 
   // Free the old elements array (but NOT the strings they point to)
+    free(arr->elements);
 
   // Update the elements and capacity to new values
+  arr->elements = double_storage;
+  arr->capacity = arr->capacity * 2;
 
 }
 
@@ -136,8 +157,16 @@ void resize_array(Array *arr) {
 char *arr_read(Array *arr, int index) {
 
   // Throw an error if the index is greater or equal to than the current count
+  if (arr->count < index)
+  {
+    printf("\n** Error! Looks like the index is greater or equal to the current count. **\n");
+    exit(1);
+  }
 
   // Otherwise, return the element at the given index
+  else {
+    return arr->elements[index];
+  }
 }
 
 
@@ -167,10 +196,16 @@ void arr_append(Array *arr, char *element) {
 
   // Resize the array if the number of elements is over capacity
   // or throw an error if resize isn't implemented yet.
+  if (arr->count == arr->capacity)
+  {
+    resize_array(arr);
+  }
 
   // Copy the element and add it to the end of the array
+  arr->elements[arr->count] = element;
 
   // Increment count by 1
+  arr->count++;
 
 }
 
@@ -215,11 +250,11 @@ int main(void)
 
   arr_insert(arr, "STRING1", 0);
   arr_append(arr, "STRING4");
-  arr_insert(arr, "STRING2", 0);
-  arr_insert(arr, "STRING3", 1);
+  // arr_insert(arr, "STRING2", 0);
+  // arr_insert(arr, "STRING3", 1);
   arr_print(arr);
-  arr_remove(arr, "STRING3");
-  arr_print(arr);
+  // arr_remove(arr, "STRING3");
+  // arr_print(arr);
 
   destroy_array(arr);
 
