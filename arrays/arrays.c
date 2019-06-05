@@ -109,6 +109,9 @@ Array *create_array (int capacity) {
  *****/
 void destroy_array(Array *arr) {
 
+for (int i = 0; i < arr->count; i++) {
+  free(arr->elements[i]);
+  }
   // Free all elements
   free(arr->elements);
 
@@ -117,13 +120,13 @@ void destroy_array(Array *arr) {
 
 }
 
+
 /*****
  * Create a new elements array with double capacity and copy elements
  * from old to new
  *****/
 void resize_array(Array *arr) {
-
-  // Create a new element storage with double capacity
+ // Create a new element storage with double capacity
   char **double_storage = malloc(2 * sizeof(arr));
 
   // Copy elements into the new storage
@@ -142,7 +145,6 @@ void resize_array(Array *arr) {
 }
 
 
-
 /************************************
  *
  *   ARRAY FUNCTIONS
@@ -155,14 +157,12 @@ void resize_array(Array *arr) {
  * Throw an error if the index is out of range.
  *****/
 char *arr_read(Array *arr, int index) {
-
   // Throw an error if the index is greater or equal to than the current count
-  if (arr->count < index)
-  {
+  if (index >= arr->count) {
     printf("\n** Error! Looks like the index is greater or equal to the current count. **\n");
-    exit(1);
+    printf("\n");
+    return NULL;
   }
-
   // Otherwise, return the element at the given index
   else {
     return arr->elements[index];
@@ -176,7 +176,6 @@ char *arr_read(Array *arr, int index) {
  * Store the VALUE of the given string, not the REFERENCE
  *****/
 void arr_insert(Array *arr, char *element, int index) {
-
   // Throw an error if the index is greater than the current count
   if (index > arr->count)
   {
@@ -204,11 +203,11 @@ void arr_insert(Array *arr, char *element, int index) {
 
 }
 
+
 /*****
  * Append an element to the end of the array
  *****/
 void arr_append(Array *arr, char *element) {
-
   // Resize the array if the number of elements is over capacity
   // or throw an error if resize isn't implemented yet.
   if (arr->count == arr->capacity)
@@ -217,12 +216,13 @@ void arr_append(Array *arr, char *element) {
   }
 
   // Copy the element and add it to the end of the array
-  arr->elements[arr->count] = element;
+  char *element_copy = strdup(element);
+  arr->elements[arr->count] = element_copy;
 
   // Increment count by 1
   arr->count++;
-
 }
+
 
 /*****
  * Remove the first occurence of the given element from the array,
@@ -231,7 +231,6 @@ void arr_append(Array *arr, char *element) {
  * Throw an error if the value is not found.
  *****/
 void arr_remove(Array *arr, char *element) {
-
   // Search for the first occurence of the element and remove it.
   // Don't forget to free its memory!
   int removed_element = 0;
